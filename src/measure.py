@@ -4,13 +4,12 @@ import Adafruit_BMP.BMP085 as BMP085
 import Adafruit_DHT
 import MySQLdb
 
-db = MySQLdb.connect(host="192.168.0.1:1194", # your host, usually localhost
-                     user="weather", # your username
-                      passwd="weather123", # your password
-                      db="weather") # name of the data base
+db = MySQLdb.connect(host="192.168.0.1",
+					 port=1194,
+                     user="weather",
+                      passwd="weather123",
+                      db="weather")
 
-# you must create a Cursor object. It will let
-#  you execute all the queries you need
 cur = db.cursor() 
 
 # BMP180
@@ -21,6 +20,14 @@ pressure1 = sensor.read_pressure()
 # DHT11
 humidity2, temperature2 = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
 
-# Use all the SQL you like
-cur.execute("INSER INTO measurement(sensorId, time, temperature, humidity, pressure) VALUES(1, NOW(), "+temperature1+", 0.0, "+pressure1+")");
-cur.execute("INSER INTO measurement(sensorId, time, temperature, humidity, pressure) VALUES(2, NOW(), "+temperature2+", "+humidity2+", 0.0)");
+
+# Write data to database
+sql1 = "INSERT INTO weather.measurement (sensorId, time, temperature, humidity, pressure) VALUES(1, NOW(), "+str(temperature1)+", 0, "+str(pressure1)+")"
+sql2 = "INSERT INTO weather.measurement (sensorId, time, temperature, humidity, pressure) VALUES(2, NOW(), "+str(temperature2)+", "+str(humidity2)+", 0)"
+
+try:
+	cur.execute(sql1);
+	cur.execute(sql2);
+	db.commit()
+except:
+	db.rollback()
