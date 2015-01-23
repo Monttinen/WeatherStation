@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:1194
--- Generation Time: Jan 23, 2015 at 08:24 PM
+-- Generation Time: Jan 23, 2015 at 09:36 PM
 -- Server version: 5.6.20-log
 -- PHP Version: 5.3.28
 
@@ -30,10 +30,10 @@ CREATE TABLE IF NOT EXISTS `measurement` (
 `id` int(11) NOT NULL,
   `sensorId` int(11) NOT NULL,
   `time` datetime NOT NULL,
-  `temperature` float DEFAULT NULL,
-  `humidity` float DEFAULT NULL,
-  `pressure` float DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `temperature` decimal(10,2) DEFAULT NULL,
+  `humidity` decimal(10,2) DEFAULT NULL,
+  `pressure` decimal(10,2) DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -46,8 +46,17 @@ CREATE TABLE IF NOT EXISTS `sensor` (
   `name` varchar(10) COLLATE utf8_bin NOT NULL,
   `hasTemperature` tinyint(1) NOT NULL DEFAULT '0',
   `hasHumidity` tinyint(1) NOT NULL DEFAULT '0',
-  `hasPressure` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+  `hasPressure` tinyint(1) NOT NULL DEFAULT '0',
+  `description` varchar(200) COLLATE utf8_bin DEFAULT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+--
+-- Dumping data for table `sensor`
+--
+
+INSERT INTO `sensor` (`id`, `name`, `hasTemperature`, `hasHumidity`, `hasPressure`, `description`) VALUES
+(1, 'BMP150', 1, 0, 1, 'A pressure/temperature sensor for outside use.'),
+(2, 'DHT11', 1, 1, 0, 'A temperature/humidity sensor for inside use.');
 
 --
 -- Indexes for dumped tables
@@ -73,12 +82,12 @@ ALTER TABLE `sensor`
 -- AUTO_INCREMENT for table `measurement`
 --
 ALTER TABLE `measurement`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=49;
 --
 -- AUTO_INCREMENT for table `sensor`
 --
 ALTER TABLE `sensor`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- Constraints for dumped tables
 --
