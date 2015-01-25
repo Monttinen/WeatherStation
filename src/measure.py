@@ -15,7 +15,7 @@ cur = db.cursor()
 # BMP180
 sensor = BMP085.BMP085()
 temperature1 = sensor.read_temperature()
-pressure1 = sensor.read_pressure()
+pressure1 = sensor.read_sealevel_pressure(95.0) # the sensors current altitude in meters
 
 # DHT11
 humidity2, temperature2 = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
