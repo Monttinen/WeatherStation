@@ -20,8 +20,20 @@ $table['cols'] = array(
 
 $rows = array();
 
+// Get some variables from url
+// l = time to get backwarsd in days
+if(isset($_GET['l'])){
+	$l = intval($_GET['l']);
+	if($l<1){
+		$l = 1;
+	}
+} else {
+  $l = 1;
+}
+
+
 // Select the data from MySQL dtabase
-$sql = "SELECT UNIX_TIMESTAMP(time) as time, pressure, temperature FROM measurement WHERE sensorId = 1 ORDER BY time ASC LIMIT 2880 ";
+$sql = "SELECT UNIX_TIMESTAMP(time) as time, pressure, temperature FROM measurement WHERE sensorId = 1 AND time > NOW() - INTERVAL $l DAY ORDER BY time DESC";
 foreach ($dbh->query($sql) as $r) {
 	$temp = array();
 	// the following line will be used to slice the Pie chart

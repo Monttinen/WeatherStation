@@ -18,7 +18,7 @@ temperature1 = sensor.read_temperature()
 pressure1 = sensor.read_sealevel_pressure(95.0) # the sensors current altitude in meters
 
 # DHT11
-humidity2, temperature2 = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4)
+humidity2, temperature2 = Adafruit_DHT.read_retry(Adafruit_DHT.DHT11, 4) # sensor type and GPIO pin given as parameter
 
 
 # Write data to database

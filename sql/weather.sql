@@ -44,9 +44,9 @@ CREATE TABLE IF NOT EXISTS `measurement` (
 CREATE TABLE IF NOT EXISTS `sensor` (
 `id` int(11) NOT NULL,
   `name` varchar(10) COLLATE utf8_bin NOT NULL,
-  `hasTemperature` tinyint(1) NOT NULL DEFAULT '0',
-  `hasHumidity` tinyint(1) NOT NULL DEFAULT '0',
-  `hasPressure` tinyint(1) NOT NULL DEFAULT '0',
+  `temperature` tinyint(1) NOT NULL DEFAULT '0',
+  `humidity` tinyint(1) NOT NULL DEFAULT '0',
+  `pressure` tinyint(1) NOT NULL DEFAULT '0',
   `description` varchar(200) COLLATE utf8_bin DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `sensor` (
 -- Dumping data for table `sensor`
 --
 
-INSERT INTO `sensor` (`id`, `name`, `hasTemperature`, `hasHumidity`, `hasPressure`, `description`) VALUES
+INSERT INTO `sensor` (`id`, `name`, `temperature`, `humidity`, `pressure`, `description`) VALUES
 (1, 'BMP150', 1, 0, 1, 'A pressure/temperature sensor for outside use.'),
 (2, 'DHT11', 1, 1, 0, 'A temperature/humidity sensor for inside use.');
 
