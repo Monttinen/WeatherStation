@@ -31,7 +31,7 @@ if (isset($_GET['l']) && preg_match("([0-9]+\shour[s]|[0-9]+\sday[s])", $_GET['l
 
 // Select the data from MySQL dtabase
 $sql = "SELECT UNIX_TIMESTAMP(time) as time, pressure, temperature FROM measurement WHERE sensorId = 1 AND time > NOW() - INTERVAL $l ORDER BY time DESC";
-echo $sql;
+
 foreach ($dbh->query($sql) as $r) {
     $temp = array();
     // the following line will be used to slice the Pie chart
