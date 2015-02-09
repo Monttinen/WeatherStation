@@ -5,44 +5,57 @@ $user = 'weather';
 $password = 'weather123';
 
 try {
-	$dbh = new PDO($dsn, $user, $password);
+    $dbh = new PDO($dsn, $user, $password);
 } catch (PDOException $e) {
-	echo 'Connection failed: ' . $e->getMessage();
+    echo 'Connection failed: ' . $e->getMessage();
 }
 
 $table = array();
 // Set table labels for Google Chart
 $table['cols'] = array(
-	array('label' => 'Time', 'type' => 'datetime'),
-	array('label' => 'Pressure', 'type' => 'number'),
-	array('label' => 'Temperature', 'type' => 'number')
+    array('label' => 'Time', 'type' => 'datetime'),
+    array('label' => 'Pressure', 'type' => 'number'),
+    array('label' => 'Temperature', 'type' => 'number')
 );
 
 $rows = array();
 
 // Get some variables from url
 // l = time to get backwarsd in days
-if(isset($_GET['l'])){
-	$l = intval($_GET['l']);
-	if($l<1){
-		$l = 1;
-	}
+if (isset($_GET['l']) && preg_match("([0-9]+\shour[s]|[0-9]+\sday[s])", $_GET['l'])) {
+    $l = trim($_GET['l'],"s");
 } else {
-  $l = 1;
+    $l = "1 day";
 }
 
 
 // Select the data from MySQL dtabase
-$sql = "SELECT UNIX_TIMESTAMP(time) as time, pressure, temperature FROM measurement WHERE sensorId = 1 AND time > NOW() - INTERVAL $l DAY ORDER BY time DESC";
+$sql = "SELECT UNIX_TIMESTAMP(time) as time, pressure, temperature FROM measurement WHERE sensorId = 1 AND time > NOW() - INTERVAL $l ORDER BY time DESC";
+echo $sql;
 foreach ($dbh->query($sql) as $r) {
-	$temp = array();
-	// the following line will be used to slice the Pie chart
-	$temp[] = array('v' => "\"" + ((string) $r['time']) + "\"");
+    $temp = array();
+    // the following line will be used to slice the Pie chart
+    $temp[] = array('v' => "\"" + ((string) $r['time']) + "\"");
 
-	// Values of each slice
-	$temp[] = array('v' => (double) $r['pressure']);
-	$temp[] = array('v' => (double) $r['temperature']);
-	$rows[] = array('c' => $temp);
+    // Values of each slice
+    $temp[] = array('v' => (double) $r['pressure']);
+    $temp[] = array('v' => (double) $r['temperature']);
+    $rows[] = array('c' => $temp);
+}
+
+if(sizeof($rows)>500){
+    $skip = round(sizeof($rows)/500.0);
+    $i=0;
+    $rows2 = array();
+    
+    foreach($rows as $r){
+        if($i==$skip){
+            $i=0;
+            $rows2[]=$r;
+        }
+        $i++;
+    }
+    $rows = $rows2;
 }
 
 $table['rows'] = $rows;
@@ -52,56 +65,69 @@ $jsonTable = json_encode($table);
 ?>
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8"> 
-		<script type="text/javascript"
-				src="https://www.google.com/jsapi?autoload={
-				'modules':[{
-				'name':'visualization',
-				'version':'1',
-				'packages':['corechart']
-				}]
-		}"></script>
-		<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>  not needed ATM -->
-		<script type="text/javascript">
-					google.setOnLoadCallback(drawChart);
-					
-					function drawChart() {
-						var json = <?php echo $jsonTable; ?>;
-						
-						// Parse unix timestamps into Date objects
-						for (var i = 0; i < json.rows.length; i++) {
-							json.rows[i].c[0].v = new Date(json.rows[i].c[0].v * 1000);
-						}
-						
-						// Set the data and options for Google Chart
-						var data = new google.visualization.DataTable(json);
-						var options = {
-						title: 'Sensor 1',
-								curveType: 'function',
-								legend: { position: 'bottom' },
-								vAxes: {0: {logScale: false, format: '# hPa'},
-										1: {logScale: false, format: '# °C'}
-								},
-								hAxis: {
-								format: 'HH:mm'
-								},
-								series:{
-								0:{targetAxisIndex:0},
-										1:{targetAxisIndex:1},
-										2:{targetAxisIndex:1}
-								}
-						};
-						
-						// Create and draw the chart to HTML
-						var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-						chart.draw(data, options);
-					}
-		</script>
-		<title>Weather Station</title>
-	</head>
-	<body>
-		<div id="curve_chart" style="width: 90%; min-width: 800px; min-height: 500px; height: 70%"></div>
-		<div id="text"></div>
-	</body>
+    <head>
+        <meta charset="UTF-8"> 
+        <script type="text/javascript"
+                src="https://www.google.com/jsapi?autoload={
+                'modules':[{
+                'name':'visualization',
+                'version':'1',
+                'packages':['corechart']
+                }]
+        }"></script>
+        <!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>  not needed ATM -->
+        <script type="text/javascript">
+                    google.setOnLoadCallback(drawChart);
+                    function drawChart() {
+                    var json = <?php echo $jsonTable; ?>;
+                            // Parse unix timestamps into Date objects
+                            for (var i = 0; i < json.rows.length; i++) {
+                    json.rows[i].c[0].v = new Date(json.rows[i].c[0].v * 1000);
+                    }
+
+                    // Set the data and options for Google Chart
+                    var data = new google.visualization.DataTable(json);
+                            var options = {
+                            title: 'Sensor 1',
+                                    curveType: 'function',
+                                    legend: { position: 'bottom' },
+                                    vAxes: {0: {logScale: false, format: '# hPa'},
+                                            1: {logScale: false, format: '# °C'}
+                                    },
+                                    hAxis: {
+                                    format: 'HH:mm'
+                                    },
+                                    series:{
+                                    0:{targetAxisIndex:0},
+                                            1:{targetAxisIndex:1},
+                                            2:{targetAxisIndex:1}
+                                    }
+                            };
+                            // Create and draw the chart to HTML
+                            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+                            chart.draw(data, options);
+                    }
+        </script>
+        <title>Weather Station</title>
+    </head>
+    <body>
+        <div id="text" style="text-align: center;">
+            <form>
+                <select name="l" onchange="submit()">
+                    <option>Time</option>
+                    <option>1 hour</option>
+                    <option>3 hours</option>
+                    <option>12 hours</option>
+                    <option>1 day</option>
+                    <option>5 days</option>
+                    <option>7 days</option>
+                    <option>14 days</option>
+                    <option>30 days</option>
+                </select>
+            </form>
+        </div>
+        <div id="curve_chart" style="width: 90%; min-width: 800px; min-height: 500px; height: 70%">
+        </div>
+        
+    </body>
 </html>
