@@ -22,7 +22,7 @@ $rows = array();
 
 // Get some variables from url
 // l = time to get backwarsd in days
-if (isset($_GET['l']) && preg_match("([0-9]+\shour[s]|[0-9]+\sday[s])", $_GET['l'])) {
+if (isset($_GET['l']) && preg_match("([0-9]+\shour[s]?|[0-9]+\sday[s]?)", $_GET['l'])) {
     $l = trim($_GET['l'],"s");
 } else {
     $l = "1 day";
