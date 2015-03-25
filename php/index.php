@@ -52,8 +52,8 @@
                         title: 'Sensor <?php echo $_SESSION["s"]; ?>',
                                 curveType: 'function',
                                 legend: { position: 'bottom' },
-                                vAxes: {0: {logScale: false, format: '# hPa'},
-                                        1: {logScale: false, format: '# °C'}
+                                vAxes: {0: {logScale: false, format: json.units[0]},
+                                        1: {logScale: false, format: json.units[1]}
                                 },
                                 hAxis: {
                                 format: 'HH:mm'
